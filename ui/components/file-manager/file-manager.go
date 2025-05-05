@@ -148,15 +148,15 @@ func (m Model) StepDirectory(direction DirMovement) error {
 func renderCursorListItem(s string) string {
 	lightGray := lipgloss.Color("#FFF")
 	purple := lipgloss.Color("99")
-	return lipgloss.NewStyle().Align(lipgloss.Center).MarginTop(1).Background(purple).Foreground(lightGray).Render(s)
+	return lipgloss.NewStyle().Width(20).Align(lipgloss.Left).MarginTop(1).Background(purple).Foreground(lightGray).Render(s)
 }
 
 func renderListItemStyles(s string) string {
 	gray := lipgloss.Color("245")
-	return lipgloss.NewStyle().Align(lipgloss.Center).MarginTop(1).Foreground(gray).Render(s)
+	return lipgloss.NewStyle().Width(20).Align(lipgloss.Left).MarginTop(1).Foreground(gray).Render(s)
 }
 
 func renderActiveListItemStyles(s string) string {
 	purple := lipgloss.Color("99")
-	return lipgloss.NewStyle().Align(lipgloss.Center).MarginTop(1).Foreground(purple).Render(s)
+	return lipgloss.NewStyle().Width(20).Align(lipgloss.Left).MarginTop(1).Foreground(purple).Render(s)
 }

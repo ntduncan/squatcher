@@ -82,6 +82,7 @@ func (m Model) View() string {
 		lipgloss.JoinVertical(
 			0,
 			m.asciiwindow.View(),
+			s.String(),
 			lipgloss.NewStyle().Height(m.ctx.MaxHeight-12).Width(m.ctx.MaxWidth-2).BorderTop(true).BorderBottom(true).BorderStyle(lipgloss.NormalBorder()).Render(
 				lipgloss.JoinHorizontal(
 					lipgloss.Left,
@@ -89,7 +90,6 @@ func (m Model) View() string {
 					m.fileviewer.View(),
 				),
 			),
-			s.String(),
 		),
 	)
 }

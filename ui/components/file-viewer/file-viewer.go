@@ -1,9 +1,13 @@
 package fileviewer
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/glamour"
+	//"github.com/charmbracelet/lipgloss"
 	"ntduncan.com/squatcher/ui/context"
 	"ntduncan.com/squatcher/ui/utils"
 )
@@ -12,6 +16,7 @@ type Model struct {
 	window   utils.Window
 	viewport viewport.Model
 	ctx      *context.ProgramContext
+	content  string
 }
 
 func NewModel(ctx *context.ProgramContext) Model {
@@ -49,5 +54,30 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) View() string {
-	return lipgloss.NewStyle().AlignVertical(lipgloss.Center).AlignHorizontal(lipgloss.Center).Render(m.ctx.ActiveFile)
+	if m.ctx.ActiveFile != "" {
+
+		content, err := m.getActiveFileContent()
+		if err != nil {
+			panic(fmt.Errorf("Error read file: %s", err))
+		}
+
+		out, err := glamour.Render(content, "dark")
+		if err != nil {
+			panic(fmt.Errorf("Error render file: %s", err))
+		}
+
+		return out
+	} else {
+		return ""
+	}
+}
+
+func (m Model) getActiveFileContent() (string, error) {
+	filedata, err := os.ReadFile(m.ctx.CurrentDir + m.ctx.ActiveFile)
+	if err != nil {
+		return "", fmt.Errorf("Could not read file: %s", err)
+	}
+
+	return string(filedata), nil
+
 }
