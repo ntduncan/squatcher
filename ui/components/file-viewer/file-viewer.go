@@ -7,6 +7,8 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
+	"github.com/charmbracelet/lipgloss"
+
 	//"github.com/charmbracelet/lipgloss"
 	"ntduncan.com/squatcher/ui/context"
 	"ntduncan.com/squatcher/ui/utils"
@@ -14,7 +16,7 @@ import (
 
 type Model struct {
 	window   utils.Window
-	viewport viewport.Model
+	Viewport viewport.Model
 	ctx      *context.ProgramContext
 	content  string
 }
@@ -23,8 +25,8 @@ func NewModel(ctx *context.ProgramContext) Model {
 	return Model{
 		window: utils.FileViewer,
 		ctx:    ctx,
-		viewport: viewport.Model{
-			Width:  ctx.MaxWidth - 20,
+		Viewport: viewport.Model{
+			Width:  ctx.MaxWidth - 25,
 			Height: ctx.MaxHeight,
 		},
 	}
@@ -35,15 +37,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j", "down":
-			m.viewport.PageDown()
+			m.Viewport.PageDown()
 		case "k", "up":
-			m.viewport.PageUp()
+			m.Viewport.PageUp()
 		case "esc", "escape":
 			m.ctx.ActiveWindow = utils.FileManager
 		}
 
 	case tea.WindowSizeMsg:
-		m.viewport.Width = msg.Width - 20
+		m.Viewport.Width = msg.Width - 25
+		m.Viewport.Height = msg.Height - 14
 	}
 
 	return m, nil
@@ -66,7 +69,12 @@ func (m Model) View() string {
 			panic(fmt.Errorf("Error render file: %s", err))
 		}
 
-		return out
+		borderColor := lipgloss.Color("99")
+		if m.ctx.ActiveWindow != utils.FileViewer {
+			borderColor = lipgloss.Color("#FFF")
+		}
+
+		return lipgloss.NewStyle().Width(m.Viewport.Width).BorderStyle(lipgloss.NormalBorder()).BorderForeground(borderColor).Render(out)
 	} else {
 		return ""
 	}

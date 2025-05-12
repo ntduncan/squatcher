@@ -38,6 +38,7 @@ func (m Model) Init() tea.Cmd {
 func (m Model) View() string {
 	s := strings.Builder{}
 	purple := lipgloss.Color("99")
+	black := lipgloss.Color("#000")
 	s.WriteString(" _____  _____ _   _  ___ _____ _____  _   _  ___________ \n")
 	s.WriteString("/  ___||  _  | | | |/ _ \\_   _/  __ \\| | | ||  ___| ___ \\\n")
 	s.WriteString("\\ `--. | | | | | | / /_\\ \\| | | /  \\/| |_| || |__ | |_/ /\n")
@@ -45,5 +46,5 @@ func (m Model) View() string {
 	s.WriteString("/\\__/ /\\ \\/' / |_| | | | || | | \\__/\\| | | || |___| |\\ \\ \n")
 	s.WriteString("\\____/  \\_/\\_\\___/\\\\_| |_/\\_/  \\____/\\_| |_/\\____/\\_| \\_|\n")
 
-	return lipgloss.NewStyle().Align(lipgloss.Center).Width(m.ctx.MaxWidth).Foreground(purple).Render(s.String())
+	return lipgloss.NewStyle().BorderStyle(lipgloss.NormalBorder()).Align(lipgloss.Center).Width(m.ctx.MaxWidth).Foreground(purple).Background(black).Render(s.String())
 }

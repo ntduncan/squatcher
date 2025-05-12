@@ -78,12 +78,12 @@ func (m Model) View() string {
 
 	s.WriteString(m.renderCWD())
 
-	return lipgloss.NewStyle().Border(lipgloss.NormalBorder()).Render(
+	return lipgloss.NewStyle().Render(
 		lipgloss.JoinVertical(
 			0,
 			m.asciiwindow.View(),
 			s.String(),
-			lipgloss.NewStyle().Height(m.ctx.MaxHeight-12).Width(m.ctx.MaxWidth-2).BorderTop(true).BorderBottom(true).BorderStyle(lipgloss.NormalBorder()).Render(
+			lipgloss.NewStyle().Height(m.ctx.MaxHeight-20).Width(m.ctx.MaxWidth).Render(
 				lipgloss.JoinHorizontal(
 					lipgloss.Left,
 					m.filemanager.View(),

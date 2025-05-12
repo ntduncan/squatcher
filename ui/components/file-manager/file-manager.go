@@ -72,10 +72,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			//Deselecting
 			case m.ctx.ActiveFile == cursorItem.Value:
 				m.ctx.ActiveFile = ""
-				m.ctx.ActiveWindow = utils.FileViewer
+				m.ctx.ActiveWindow = utils.FileManager
 			//Select File
 			default:
 				m.ctx.ActiveFile = m.ctx.CurrentDirItems[m.cursor].Value
+				m.ctx.ActiveWindow = utils.FileViewer
+
 			}
 		case "q", "ctrl+c":
 			return m, tea.Quit
@@ -108,7 +110,7 @@ func (m Model) View() string {
 		s.WriteString(renderListItemStyles(item.Value))
 	}
 
-	return lipgloss.NewStyle().Height(m.ctx.MaxHeight - 12).Width(20).BorderRight(true).BorderStyle(lipgloss.NormalBorder()).Foreground(lipgloss.Color("#FFF")).Render(s.String())
+	return lipgloss.NewStyle().Height(m.ctx.MaxHeight - 20).Width(20).BorderStyle(lipgloss.NormalBorder()).Foreground(lipgloss.Color("#FFF")).Render(s.String())
 }
 
 func (m Model) StepDirectory(direction DirMovement) error {
