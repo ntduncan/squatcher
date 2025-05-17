@@ -22,34 +22,56 @@ type Model struct {
 }
 
 func NewModel(ctx *context.ProgramContext) Model {
-	return Model{
+
+	m := Model{
 		window: utils.FileViewer,
 		ctx:    ctx,
 		Viewport: viewport.Model{
-			Width:  ctx.MaxWidth - 25,
-			Height: ctx.MaxHeight,
+			Width:  ctx.MaxWidth - 18,
+			Height: ctx.MaxHeight - 22,
 		},
 	}
+
+	return m
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+	var cmds []tea.Cmd
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j", "down":
-			m.Viewport.PageDown()
+			m.Viewport.ScrollDown(5)
+			m.Viewport, cmd = m.Viewport.Update(msg)
+			return m, cmd
+
 		case "k", "up":
-			m.Viewport.PageUp()
-		case "esc", "escape":
+			m.Viewport.ScrollUp(5)
+			m.Viewport, cmd = m.Viewport.Update(msg)
+			return m, cmd
+		case "esc", "escape", "h", "left":
 			m.ctx.ActiveWindow = utils.FileManager
+			//m.ctx.ActiveFile = ""
 		}
 
 	case tea.WindowSizeMsg:
-		m.Viewport.Width = msg.Width - 25
-		m.Viewport.Height = msg.Height - 14
+		m.Viewport = viewport.New(msg.Width-18, msg.Height-22)
+		m.Viewport.YPosition = 22
+
 	}
 
-	return m, nil
+	content, err := m.getActiveFileContent()
+	if err != nil {
+		panic("An Error happened")
+	}
+
+	m.Viewport.SetContent(content)
+	m.Viewport, cmd = m.Viewport.Update(msg)
+	cmds = append(cmds, cmd)
+
+	return m, tea.Batch(cmds...)
 }
 
 func (m Model) Init() tea.Cmd {
@@ -64,7 +86,12 @@ func (m Model) View() string {
 			panic(fmt.Errorf("Error read file: %s", err))
 		}
 
-		out, err := glamour.Render(content, "dark")
+		r, _ := glamour.NewTermRenderer(
+			glamour.WithAutoStyle(),
+			glamour.WithWordWrap(m.ctx.MaxWidth-22),
+		)
+
+		out, err := r.Render(content)
 		if err != nil {
 			panic(fmt.Errorf("Error render file: %s", err))
 		}
@@ -74,10 +101,16 @@ func (m Model) View() string {
 			borderColor = lipgloss.Color("#FFF")
 		}
 
-		return lipgloss.NewStyle().Width(m.Viewport.Width).BorderStyle(lipgloss.NormalBorder()).BorderForeground(borderColor).Render(out)
-	} else {
-		return ""
+		return lipgloss.NewStyle().
+			Width(m.Viewport.Width).
+			Height(m.ctx.MaxHeight - 10).
+			MaxHeight(m.ctx.MaxHeight - 10).
+			BorderStyle(lipgloss.DoubleBorder()).
+			BorderForeground(borderColor).
+			Render(out)
 	}
+
+	return ""
 }
 
 func (m Model) getActiveFileContent() (string, error) {

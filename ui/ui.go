@@ -76,14 +76,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string {
 	s := strings.Builder{}
 
-	s.WriteString(m.renderCWD())
+	s.WriteString(m.renderCWD() + m.ctx.ActiveFile)
 
 	return lipgloss.NewStyle().Render(
 		lipgloss.JoinVertical(
 			0,
 			m.asciiwindow.View(),
 			s.String(),
-			lipgloss.NewStyle().Height(m.ctx.MaxHeight-20).Width(m.ctx.MaxWidth).Render(
+			lipgloss.NewStyle().Height(m.ctx.MaxHeight-12).Width(m.ctx.MaxWidth).Render(
 				lipgloss.JoinHorizontal(
 					lipgloss.Left,
 					m.filemanager.View(),

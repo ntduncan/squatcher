@@ -66,6 +66,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case cursorItem.IsDir:
 				err := m.StepDirectory(Down)
+				m.cursor = 0
 				if err != nil {
 					panic(fmt.Errorf("Error reading new dir: %s", err))
 				}
@@ -77,11 +78,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			default:
 				m.ctx.ActiveFile = m.ctx.CurrentDirItems[m.cursor].Value
 				m.ctx.ActiveWindow = utils.FileViewer
-
 			}
 		case "q", "ctrl+c":
 			return m, tea.Quit
 		}
+
 	case tea.WindowSizeMsg:
 		m.viewport.Height = msg.Height - 11
 	}
@@ -97,7 +98,7 @@ func (m Model) View() string {
 	s := strings.Builder{}
 
 	for i, item := range m.ctx.CurrentDirItems {
-		if i == m.cursor {
+		if i == m.cursor && m.ctx.ActiveWindow == utils.FileManager {
 			s.WriteString(renderCursorListItem(item.Value))
 			continue
 		}
@@ -110,7 +111,7 @@ func (m Model) View() string {
 		s.WriteString(renderListItemStyles(item.Value))
 	}
 
-	return lipgloss.NewStyle().Height(m.ctx.MaxHeight - 20).Width(20).BorderStyle(lipgloss.NormalBorder()).Foreground(lipgloss.Color("#FFF")).Render(s.String())
+	return lipgloss.NewStyle().Height(m.ctx.MaxHeight - 11).Width(20).BorderStyle(lipgloss.NormalBorder()).Foreground(lipgloss.Color("#FFF")).Render(s.String())
 }
 
 func (m Model) StepDirectory(direction DirMovement) error {
@@ -150,6 +151,7 @@ func (m Model) StepDirectory(direction DirMovement) error {
 func renderCursorListItem(s string) string {
 	lightGray := lipgloss.Color("#FFF")
 	purple := lipgloss.Color("99")
+
 	return lipgloss.NewStyle().Width(20).Align(lipgloss.Left).MarginTop(1).Background(purple).Foreground(lightGray).Render(s)
 }
 
